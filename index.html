@@ -7,7 +7,7 @@
 <style>
 html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,"Noto Sans KR",sans-serif;overflow:hidden}
 svg#map{position:fixed;inset:0;width:100%;height:100%}
-.border{fill:none;stroke:#fff;stroke-width:.4;stroke-opacity:.85;vector-effect:non-scaling-stroke}
+.border{fill:none;stroke:#fff;stroke-width:1.2;stroke-opacity:.95;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .dot{cursor:pointer;stroke-width:1;vector-effect:non-scaling-stroke}
 .dot:hover{stroke:#fff;stroke-width:2}
 .pick{cursor:crosshair}
@@ -81,7 +81,7 @@ const W=1000, H=622, X0=416.6666666666667, TY=423.40087033866854, K=159.15494309
 const svg=document.getElementById('map'), dotsG=document.getElementById('dots'), tip=document.getElementById('tip');
 const $=id=>document.getElementById(id);
 
-// 기본 데이터 (대략적·예시). 사용자가 등록한 데이터는 이 브라우저(localStorage)에 저장됩니다.
+// 기본 데이터 (대략적·예시). 사용자가 등록한 데이터는 서버에 저장됩니다.
 const SEED=[
  ['수단·남수단',13,30,[['전쟁·분쟁','무력 충돌이 이어지며 대규모 피란이 발생하고 있습니다.'],['난민·실향','주변국으로 피란민이 계속 이동하고 있습니다.'],['기아','식량 접근성이 크게 악화된 지역이 있습니다.'],['빈곤','기본 서비스가 크게 부족합니다.']]],
  ['사헬 지역',14,2,[['전쟁·분쟁','무장 세력으로 인한 불안이 지속됩니다.'],['기후변화','사막화와 가뭄이 농업을 위협합니다.'],['기아','식량 불안정이 반복됩니다.'],['빈곤','극심한 빈곤이 널리 퍼져 있습니다.'],['난민·실향','내부 실향민이 많습니다.']]],
@@ -105,12 +105,16 @@ const SEED=[
  ['남아프리카공화국',-29,24,[['불평등','세계 최고 수준의 불평등을 보입니다.'],['빈곤','실업률이 높습니다.']]],
  ['북극',74,-40,[['기후변화','빙하와 해빙이 빠르게 줄고 있습니다.'],['환경오염','생태계 변화가 가속됩니다.']]]
 ];
-const KEY='gc_regions_v1';
-let regions;
-try{regions=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!Array.isArray(regions)){regions=SEED.map(s=>({n:s[0],lat:s[1],lon:s[2],i:s[3].map(x=>({t:x[0],d:x[1]}))}))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(regions))}catch(e){}}
-
+let entries=[];
+function buildRegions(){
+  const rs=SEED.map(x=>({n:x[0],lat:x[1],lon:x[2],i:x[3].map(y=>({t:y[0],d:y[1]}))}));
+  const by=new Map(rs.map(r=>[r.n,r]));
+  entries.forEach(e=>{let r=by.get(e.n);
+    if(!r){r={n:e.n,lat:e.lat,lon:e.lon,i:[]};by.set(e.n,r);rs.push(r)}
+    const it={t:e.t,d:e.d};if(e.s)it.s=e.s;r.i.push(it)});
+  return rs}
+let regions=buildRegions();
+async function load(){try{const r=await fetch('/api/entries');if(r.ok){entries=await r.json();regions=buildRegions();render()}}catch(e){}}
 const COLORS=['#fff6a8','#ffec5c','#ffd21f','#ffb800','#ff9900'];
 const col=c=>COLORS[Math.min(c,5)-1];
 const baseR=c=>4+Math.min(c,6)*3;
@@ -185,18 +189,22 @@ svg.addEventListener('click',e=>{if(!picking)return;
   const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
   picked=inv(p.x,p.y);picking=false;svg.classList.remove('pick');$('hint').style.display='none';
   openModal(-1);$('fLoc').textContent=picked[1].toFixed(1)+'°, '+picked[0].toFixed(1)+'°'});
-$('form').onsubmit=e=>{e.preventDefault();
+$('form').onsubmit=async e=>{e.preventDefault();
   const sel=parseInt($('fRegion').value),desc=$('fDesc').value.trim(),src=$('fSrc').value.trim();
   if(!desc)return;
   if(src&&!/^https?:\/\//i.test(src)){alert('출처 링크는 http:// 또는 https:// 로 시작해야 합니다.');return}
-  const issue={t:$('fType').value,d:desc};if(src)issue.s=src;
-  let idx=sel;
-  if(sel===-1){const n=$('fName').value.trim();
+  let n,lat,lon;
+  if(sel===-1){n=$('fName').value.trim();
     if(!n||!picked){alert('새 지역의 이름과 위치(지도에서 선택)를 입력해 주세요.');return}
-    regions.push({n,lat:picked[1],lon:picked[0],i:[issue]});idx=regions.length-1}
-  else regions[sel].i.push(issue);
-  save();render();$('form').reset();picked=null;closeModal();openRegion(idx)};
-render();
+    lat=picked[1];lon=picked[0]}
+  else{n=regions[sel].n;lat=regions[sel].lat;lon=regions[sel].lon}
+  try{const r=await fetch('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({n,lat,lon,t:$('fType').value,d:desc,s:src})});
+    if(!r.ok){alert((await r.json().catch(()=>({}))).error||'등록에 실패했습니다.');return}
+  }catch(err){alert('서버에 연결할 수 없습니다. 서버(npm start)를 실행했는지 확인해 주세요.');return}
+  await load();$('form').reset();picked=null;closeModal();
+  openRegion(regions.findIndex(r=>r.n===n))};
+render();load();setInterval(load,30000);
 </script>
 </body>
 </html>
