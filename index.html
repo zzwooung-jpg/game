@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>지구 공동체의 문제</title>
+<meta name="description" content="빈곤, 기후변화, 전쟁, 난민, 불평등, 환경오염 등 전 세계가 함께 직면한 문제를 한눈에 보기">
+<style>
+:root{--bg:#0f1419;--card:#1a212b;--text:#e8edf2;--muted:#9aa7b4;--accent:#f0a04b;--line:#2a3340}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{padding:72px 20px 48px;text-align:center;background:radial-gradient(circle at 50% 0,#22303f,var(--bg))}
+h1{font-size:clamp(2rem,6vw,3.5rem);margin:0 0 12px}
+header p{color:var(--muted);max-width:620px;margin:0 auto}
+main{max-width:1000px;margin:0 auto;padding:0 20px 60px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:32px 0}
+.filters button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:.95rem}
+.filters button.on{background:var(--accent);color:#111;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card .icon{font-size:2rem}
+.card h2{margin:6px 0 4px;font-size:1.25rem}
+.stat{color:var(--accent);font-size:1.7rem;font-weight:700;margin:8px 0 2px}
+.card p{color:var(--muted);margin:6px 0;font-size:.95rem}
+.card a{color:var(--accent);font-size:.85rem}
+.hidden{display:none}
+.act{margin-top:48px;padding:28px;background:var(--card);border-radius:14px;border:1px solid var(--line)}
+.act h2{margin-top:0}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:24px 20px 48px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌍 지구 공동체의 문제</h1>
+  <p>우리는 하나의 지구에 살고 있습니다. 전 세계가 함께 마주한 문제들을 숫자와 함께 살펴보고, 무엇을 할 수 있는지 알아보세요.</p>
+</header>
+<main>
+  <div class="filters" id="filters">
+    <button class="on" data-f="all">전체</button>
+    <button data-f="people">사람</button>
+    <button data-f="planet">환경</button>
+    <button data-f="peace">평화</button>
+  </div>
+  <div class="grid" id="grid">
+    <article class="card" data-c="people"><div class="icon">💸</div><h2>빈곤</h2>
+      <div class="stat">약 7~8억 명</div>
+      <p>하루 약 3달러 미만으로 살아가는 극빈층 인구(세계은행 추정). 절반 이상이 사하라 이남 아프리카에 있습니다.</p>
+      <a href="https://www.worldbank.org/en/topic/poverty" target="_blank" rel="noopener">출처: 세계은행</a></article>
+    <article class="card" data-c="people"><div class="icon">🍞</div><h2>기아</h2>
+      <div class="stat">약 7억 3천만 명</div>
+      <p>2023년 기준 만성적인 굶주림에 시달린 인구. 세계 11명 중 1명 꼴입니다.</p>
+      <a href="https://www.fao.org/publications/home/fao-flagship-publications/the-state-of-food-security-and-nutrition-in-the-world" target="_blank" rel="noopener">출처: FAO SOFI</a></article>
+    <article class="card" data-c="people"><div class="icon">⚖️</div><h2>불평등</h2>
+      <div class="stat">상위 1% ≈ 45%</div>
+      <p>세계 상위 1%가 전 세계 개인 자산의 40%대 중반을 보유합니다(UBS 추정).</p>
+      <a href="https://www.ubs.com/global/en/wealth-management/insights/global-wealth-report.html" target="_blank" rel="noopener">출처: UBS Global Wealth Report</a></article>
+    <article class="card" data-c="peace"><div class="icon">💥</div><h2>전쟁·분쟁</h2>
+      <div class="stat">국가 간·내 분쟁 59건</div>
+      <p>2023년 국가가 개입한 무력 분쟁 수는 1946년 집계 이래 최대였습니다.</p>
+      <a href="https://ucdp.uu.se/" target="_blank" rel="noopener">출처: 웁살라 분쟁 데이터 프로그램</a></article>
+    <article class="card" data-c="peace"><div class="icon">🚶</div><h2>난민·실향민</h2>
+      <div class="stat">1억 2천만 명 이상</div>
+      <p>전쟁, 박해, 재난으로 집을 떠나야 했던 사람들(2024년 중반, UNHCR).</p>
+      <a href="https://www.unhcr.org/refugee-statistics" target="_blank" rel="noopener">출처: UNHCR</a></article>
+    <article class="card" data-c="planet"><div class="icon">🔥</div><h2>기후변화</h2>
+      <div class="stat">+1.5°C 돌파</div>
+      <p>2024년은 산업화 이전 대비 연평균 기온이 처음으로 1.5°C를 넘은 해로 기록됐습니다.</p>
+      <a href="https://climate.copernicus.eu/" target="_blank" rel="noopener">출처: Copernicus</a></article>
+    <article class="card" data-c="planet"><div class="icon">🏭</div><h2>대기·환경 오염</h2>
+      <div class="stat">연 약 700만 명</div>
+      <p>대기오염으로 인한 조기 사망자 수 추정치. 세계 인구 대부분이 WHO 권고 기준을 넘는 공기를 마십니다.</p>
+      <a href="https://www.who.int/health-topics/air-pollution" target="_blank" rel="noopener">출처: WHO</a></article>
+    <article class="card" data-c="planet"><div class="icon">🌳</div><h2>생물다양성 감소</h2>
+      <div class="stat">약 100만 종 위기</div>
+      <p>서식지 파괴와 기후변화로 멸종 위기에 놓인 동식물 종 수 추정치(IPBES).</p>
+      <a href="https://www.ipbes.net/" target="_blank" rel="noopener">출처: IPBES</a></article>
+  </div>
+
+  <section class="act">
+    <h2>내가 할 수 있는 일</h2>
+    <p>신뢰할 수 있는 단체 후원 · 에너지 절약과 대중교통 이용 · 지역 사회 봉사 · 정확한 정보 공유 · 투표와 시민 참여.</p>
+  </section>
+</main>
+<footer>수치는 각 기관의 최신 발표에 따라 달라질 수 있는 대략적 값입니다. 정확한 내용은 출처 링크를 확인하세요.</footer>
+<script>
+const btns=document.querySelectorAll('#filters button'),cards=document.querySelectorAll('.card');
+btns.forEach(b=>b.onclick=()=>{
+  btns.forEach(x=>x.classList.toggle('on',x===b));
+  cards.forEach(c=>c.classList.toggle('hidden',b.dataset.f!=='all'&&c.dataset.c!==b.dataset.f));
+});
+</script>
+</body>
+</html>
